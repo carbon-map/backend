@@ -13,9 +13,11 @@ import (
 	"github.com/labstack/echo/v4" //引入echo框架
 )
 
-// echo.Context中存放了request跟response
-// Echo的Handler function 預設會回傳一個error變數，存放錯誤訊息
 func Home(c echo.Context) error {
+	return c.File("view/index.html")
+}
+
+func DataServe(c echo.Context) error {
 	log := model.InitLogger()
 
 	// 讀取 .env 檔案
@@ -48,12 +50,13 @@ func Home(c echo.Context) error {
 		if err := rows.Scan(&amount); err != nil { //將讀取到的資料存入變數中
 			log.Error("讀取資料失敗:", err)
 		}
-		ans += fmt.Sprintln(amount)
+		ans += fmt.Sprint(amount)
 	}
 
 	// 準備回傳給客戶端的資料
 	returnValue := map[string]interface{}{
-		"amount": ans,
+		"SQL_cmd": SQL_cmd,
+		"amount":  ans,
 	}
 
 	// 將回傳資料轉換成JSON格式

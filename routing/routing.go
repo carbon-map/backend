@@ -8,4 +8,5 @@ import (
 
 func Routing(e *echo.Echo) {
 	e.GET("/", controller.Home)
+	e.GET("/data", controller.DataServe)
 }

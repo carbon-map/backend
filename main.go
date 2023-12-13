@@ -9,7 +9,8 @@ import (
 
 func main() {
 	log := model.InitLogger()
-	e := echo.New() //建立一個Echo的物件
+	e := echo.New()               //建立一個Echo的物件
+	e.Static("/static", "static") //註冊靜態檔案路徑
 
 	routing.Routing(e) //將建立的Echo物件傳入routing() function
 
