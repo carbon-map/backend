@@ -14,7 +14,7 @@ import (
 )
 
 func Home(c echo.Context) error {
-	return c.File("view/index.html")
+	return c.File("view/home.html")
 }
 
 func DataServe(c echo.Context) error {
