@@ -3,6 +3,7 @@ package controller
 import (
 	"backend/model" //引入model套件
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -31,25 +32,36 @@ func Home(c echo.Context) error {
 	defer db.Close()
 
 	// 查詢資料庫中的表格
-	rows, err := db.Query("SELECT * FROM carbonmap")
+	SQL_cmd := "SELECT amount FROM carbonmap where year = " + c.QueryParam("year") + " and month = " + c.QueryParam("month") + " and city = '" + c.QueryParam("city") + "'"
+	log.Info(SQL_cmd)
+	rows, err := db.Query(SQL_cmd)
 	if err != nil {
-		log.Fatal("查詢資料失敗:", err)
+		log.Error("查詢資料失敗:", err)
 	}
 	defer rows.Close()
 
 	var ans = ""
-	for rows.Next() {
-		var (
-			year   int
-			month  int
-			city   string
+	for rows.Next() { //逐 row 讀取回傳的資料
+		var ( //定義一系列的變數，對應至回傳資料中的 column
 			amount int64
 		)
-		if err := rows.Scan(&year, &month, &city, &amount); err != nil {
-			log.Fatal("讀取資料失敗:", err)
+		if err := rows.Scan(&amount); err != nil { //將讀取到的資料存入變數中
+			log.Error("讀取資料失敗:", err)
 		}
-		ans += fmt.Sprintln(year, month, city, amount)
+		ans += fmt.Sprintln(amount)
 	}
 
-	return c.String(http.StatusOK, ans) //回傳字串形式的response跟status code給客戶端
+	// 準備回傳給客戶端的資料
+	returnValue := map[string]interface{}{
+		"amount": ans,
+	}
+
+	// 將回傳資料轉換成JSON格式
+	jsonData, err := json.Marshal(returnValue)
+	if err != nil {
+		log.Error("轉換 JSON 時發生錯誤:", err)
+	}
+
+	// 回傳字串格式的 json 資料給客戶端
+	return c.String(http.StatusOK, string(jsonData))
 }
