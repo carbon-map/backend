@@ -59,7 +59,7 @@ func DataServe(c echo.Context) error {
 		"amount":  ans,
 	}
 
-	// 將回傳資料轉換成JSON格式
+	// 將回傳資料轉換成JSON格式，jsonData 是 []byte 型態，已打包好的 JSON 資料
 	jsonData, err := json.Marshal(returnValue)
 	if err != nil {
 		log.Error("轉換 JSON 時發生錯誤:", err)
