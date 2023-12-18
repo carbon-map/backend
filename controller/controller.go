@@ -34,7 +34,7 @@ func DataServe(c echo.Context) error {
 	defer db.Close()
 
 	// 查詢資料庫中的表格
-	SQL_cmd := "SELECT amount FROM carbonmap where year = " + c.QueryParam("year") + " and month = " + c.QueryParam("month") + " and city = '" + c.QueryParam("city") + "'"
+	SQL_cmd := "SELECT amount, isPredict FROM carbonmap where year = " + c.QueryParam("year") + " and month = " + c.QueryParam("month") + " and city = '" + c.QueryParam("city") + "'"
 	log.Info(SQL_cmd)
 	rows, err := db.Query(SQL_cmd)
 	if err != nil {
@@ -42,21 +42,28 @@ func DataServe(c echo.Context) error {
 	}
 	defer rows.Close()
 
-	var ans = ""
+	var amount string = ""
+	var isPredict string = ""
 	for rows.Next() { //逐 row 讀取回傳的資料
-		var ( //定義一系列的變數，對應至回傳資料中的 column
-			amount int64
-		)
-		if err := rows.Scan(&amount); err != nil { //將讀取到的資料存入變數中
+		// var ( //定義一系列的變數，對應至回傳資料中的 column
+		// 	_amount int64
+		// 	_isPredict bool
+		// )
+		if err := rows.Scan(&amount, &isPredict); err != nil { //將讀取到的資料存入變數中
 			log.Error("讀取資料失敗:", err)
 		}
-		ans += fmt.Sprint(amount)
+		if isPredict == "0" {
+			isPredict = "false"
+		} else if isPredict == "1" {
+			isPredict = "true"
+		}
 	}
 
 	// 準備回傳給客戶端的資料
 	returnValue := map[string]interface{}{
-		"SQL_cmd": SQL_cmd,
-		"amount":  ans,
+		"SQL_cmd":   SQL_cmd,
+		"amount":    amount,
+		"isPredict": isPredict,
 	}
 
 	// 將回傳資料轉換成JSON格式，jsonData 是 []byte 型態，已打包好的 JSON 資料
