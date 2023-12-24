@@ -34,9 +34,9 @@ func DataServe(c echo.Context) error {
 	defer db.Close()
 
 	// 查詢資料庫中的表格
-	SQL_cmd := "SELECT amount, isPredict FROM carbonmap where year = " + c.QueryParam("year") + " and month = " + c.QueryParam("month") + " and city = '" + c.QueryParam("city") + "'"
+	SQL_cmd := "SELECT amount, isPredict FROM carbonmap where year = ? and month = ? and city = '?'"
 	log.Info(SQL_cmd)
-	rows, err := db.Query(SQL_cmd)
+	rows, err := db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("month"), c.QueryParam("city"))
 	if err != nil {
 		log.Error("查詢資料失敗:", err)
 	}
