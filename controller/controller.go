@@ -33,14 +33,26 @@ func DataServe(c echo.Context) error {
 	}
 	defer db.Close()
 
-	// 查詢資料庫中的表格
-	SQL_cmd := "SELECT amount, isPredict FROM carbonmap where year = ? and month = ? and city = ?"
-	log.Info(SQL_cmd)
-	rows, err := db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("month"), c.QueryParam("city"))
-	if err != nil {
-		log.Error("查詢資料失敗:", err)
+	var rows *sql.Rows
+	var SQL_cmd string
+	if c.QueryParam("month") == "all" {
+		SQL_cmd := "SELECT amount, isPredict FROM carbonmap where year = ? and city = ?"
+		log.Info(SQL_cmd)
+		rows, err := db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("city"))
+		if err != nil {
+			log.Error("查詢資料失敗:", err)
+		}
+		defer rows.Close()
+	} else {
+		// 查詢資料庫中的表格
+		SQL_cmd := "SELECT amount, isPredict FROM carbonmap where year = ? and month = ? and city = ?"
+		log.Info(SQL_cmd)
+		rows, err := db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("month"), c.QueryParam("city"))
+		if err != nil {
+			log.Error("查詢資料失敗:", err)
+		}
+		defer rows.Close()
 	}
-	defer rows.Close()
 
 	var amount string = ""
 	var isPredict string = ""
