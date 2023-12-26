@@ -33,26 +33,26 @@ func DataServe(c echo.Context) error {
 	}
 	defer db.Close()
 
-	var rows *sql.Rows
+	// 查詢資料庫中的表格
 	var SQL_cmd string
+	var rows *sql.Rows
 	if c.QueryParam("month") == "all" {
-		SQL_cmd := "SELECT amount, isPredict FROM carbonmap where year = ? and city = ?"
-		log.Info(SQL_cmd)
-		rows, err := db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("city"))
-		if err != nil {
-			log.Error("查詢資料失敗:", err)
-		}
-		defer rows.Close()
+		SQL_cmd = "SELECT amount, isPredict FROM carbonmap where year = ? and city = ?"
 	} else {
-		// 查詢資料庫中的表格
-		SQL_cmd := "SELECT amount, isPredict FROM carbonmap where year = ? and month = ? and city = ?"
-		log.Info(SQL_cmd)
-		rows, err := db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("month"), c.QueryParam("city"))
-		if err != nil {
-			log.Error("查詢資料失敗:", err)
-		}
-		defer rows.Close()
+		SQL_cmd = "SELECT amount, isPredict FROM carbonmap where year = ? and month = ? and city = ?"
 	}
+	log.Info(SQL_cmd)
+	log.Info(c.QueryParam("year"), c.QueryParam("month"), c.QueryParam("city"))
+
+	if c.QueryParam("month") == "all" {
+		rows, err = db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("city"))
+	} else {
+		rows, err = db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("month"), c.QueryParam("city"))
+	}
+	if err != nil {
+		log.Error("查詢資料失敗:", err)
+	}
+	defer rows.Close()
 
 	var amount string = ""
 	var isPredict string = ""
