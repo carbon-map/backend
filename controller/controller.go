@@ -34,25 +34,28 @@ func DataServe(c echo.Context) error {
 	defer db.Close()
 
 	// 查詢資料庫中的表格
-	var SQL_cmd string
+	var SQL_cmd string  // 紀錄參數化查詢的SQL指令
+	var queryStr string // 紀錄真正查詢的SQL指令
 	var rows *sql.Rows
 	if c.QueryParam("month") == "all" { //判斷是否為查詢全年資料
 		SQL_cmd = "SELECT amount, isPredict FROM carbonmap where year = ? and city = ?"
 	} else {
 		SQL_cmd = "SELECT amount, isPredict FROM carbonmap where year = ? and month = ? and city = ?"
 	}
-	log.Info(SQL_cmd)
-	log.Info(c.QueryParam("year"), c.QueryParam("month"), c.QueryParam("city"))
 
 	if c.QueryParam("month") == "all" { //判斷是否為查詢全年資料
 		rows, err = db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("city"))
+		queryStr = fmt.Sprintf(SQL_cmd, c.QueryParam("year"), c.QueryParam("city"))
 	} else {
 		rows, err = db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("month"), c.QueryParam("city"))
+		queryStr = fmt.Sprintf(SQL_cmd, c.QueryParam("year"), c.QueryParam("city"))
 	}
 	if err != nil {
 		log.Error("查詢資料失敗:", err)
 	}
 	defer rows.Close()
+
+	log.Info(queryStr)
 
 	var amount string = ""
 	var isPredict string = ""
@@ -78,7 +81,8 @@ func DataServe(c echo.Context) error {
 
 	// 準備回傳給客戶端的資料
 	returnValue := map[string]interface{}{
-		"SQL_cmd":   SQL_cmd,
+		"SQL_cmd":   queryStr,
+		"parm":      c.QueryParam("year") + " " + c.QueryParam("month") + " " + c.QueryParam("city"),
 		"amount":    amountArray,
 		"isPredict": isPredictArray,
 	}
