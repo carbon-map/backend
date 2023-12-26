@@ -36,7 +36,7 @@ func DataServe(c echo.Context) error {
 	// 查詢資料庫中的表格
 	var SQL_cmd string
 	var rows *sql.Rows
-	if c.QueryParam("month") == "all" {
+	if c.QueryParam("month") == "all" { //判斷是否為查詢全年資料
 		SQL_cmd = "SELECT amount, isPredict FROM carbonmap where year = ? and city = ?"
 	} else {
 		SQL_cmd = "SELECT amount, isPredict FROM carbonmap where year = ? and month = ? and city = ?"
@@ -44,7 +44,7 @@ func DataServe(c echo.Context) error {
 	log.Info(SQL_cmd)
 	log.Info(c.QueryParam("year"), c.QueryParam("month"), c.QueryParam("city"))
 
-	if c.QueryParam("month") == "all" {
+	if c.QueryParam("month") == "all" { //判斷是否為查詢全年資料
 		rows, err = db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("city"))
 	} else {
 		rows, err = db.Query(SQL_cmd, c.QueryParam("year"), c.QueryParam("month"), c.QueryParam("city"))
@@ -56,6 +56,8 @@ func DataServe(c echo.Context) error {
 
 	var amount string = ""
 	var isPredict string = ""
+	amountArray := make([]string, 0)
+	isPredictArray := make([]string, 0)
 	for rows.Next() { //逐 row 讀取回傳的資料
 		// var ( //定義一系列的變數，對應至回傳資料中的 column
 		// 	_amount int64
@@ -69,13 +71,16 @@ func DataServe(c echo.Context) error {
 		} else if isPredict == "1" {
 			isPredict = "true"
 		}
+
+		amountArray = append(amountArray, amount)
+		isPredictArray = append(isPredictArray, isPredict)
 	}
 
 	// 準備回傳給客戶端的資料
 	returnValue := map[string]interface{}{
 		"SQL_cmd":   SQL_cmd,
-		"amount":    amount,
-		"isPredict": isPredict,
+		"amount":    amountArray,
+		"isPredict": isPredictArray,
 	}
 
 	// 將回傳資料轉換成JSON格式，jsonData 是 []byte 型態，已打包好的 JSON 資料
