@@ -11,9 +11,9 @@ power by golang echo
 ### request parameters
 | 參數名稱   | 類型     | 必要性 | 說明         |
 |-----------|----------|--------|--------------|
-| year      | string   | 是     | 選取 2023 年 |
-| month     | string   | 是     | 選取 12 月   |
-| city      | string   | 是     | 選取 嘉義市  |
+| year      | string   | 是     | 選取年分 |
+| month     | string   | 是     | 選取月分 |
+| city      | string   | 是     | 選取城市 |
 
 ### request example:
 ```
@@ -23,8 +23,8 @@ http://{your backend url}/data?year=2023&month=12&city=嘉義市
 ### response parameters
 | 參數名稱     | 類型      | 必要性 | 說明                                |
 |-------------|-----------|--------|-------------------------------------|
-| SQL_cmd     | string    | 是     | SQL query database 的指令           |
-| amount      | string[]  | 是     | 碳排放量，只會有一筆資料             |
+| SQL_cmd     | string    | 是     | 後端 query database 的指令           |
+| amount      | string[]  | 是     | 碳排放量，只會有一筆資料              |
 | isPredict   | string[]  | 是     | 該筆資料是否是預測的，只會有一筆資料  |
 
 response example:
@@ -49,9 +49,9 @@ response example:
 ### request parameters
 | 參數名稱  | 類型     | 必要性 | 說明              |
 |----------|----------|--------|-------------------|
-| year     | string   | 是     | 選取 2023 年      |
+| year     | string   | 是     | 選取年分          |
 | month    | string   | 是     | 本參數固定為 all  |
-| city     | string   | 是     | 選取 嘉義市       |
+| city     | string   | 是     | 選取城市          |
 
 ### request example:
 ```
@@ -59,11 +59,11 @@ http://{your backend url}/data?year=2023&month=all&city=嘉義市
 ```
 
 ### response parameters
-| 參數名稱    | 類型      | 必要性 | 說明                       |
-|------------|-----------|--------|----------------------------|
-| SQL_cmd    | string    | 是     | SQL query database 的指令  |
-| amount     | string[]  | 是     | 碳排放量                   |
-| isPredict  | string[]  | 是     | 該筆資料是否是預測的        |
+| 參數名稱    | 類型      | 必要性 | 說明                        |
+|------------|-----------|--------|-----------------------------|
+| SQL_cmd    | string    | 是     | 後端 query database 的指令  |
+| amount     | string[]  | 是     | 碳排放量                    |
+| isPredict  | string[]  | 是     | 該筆資料是否是預測的         |
 
 response example:
 ```
